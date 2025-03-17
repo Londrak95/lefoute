@@ -1,103 +1,73 @@
-import Image from "next/image";
+'use client'
+
+import { useState, useEffect } from 'react'
+
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [standings, setStandings] = useState(null)
+  const [order, setOrder] = useState("asc")
+  const [sortField, setSortField] = useState("")
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  function Header({ label, standing_field }) {
+    let handleOnClick = null
+    if (standing_field) {
+      handleOnClick = () => {
+        const sorted = [...standings].sort((a, b) => {
+          if (order === "asc") {
+            return a[standing_field] < b[standing_field] ? -1 : 1
+          }
+          return a[standing_field] < b[standing_field] ? 1 : -1
+        })
+        setSortField(standing_field)
+        setOrder(order === "asc" ? "desc" : "asc")
+        setStandings(sorted)
+      }
+    }
+
+    let className = "px-6 py-3"
+    if (standing_field === sortField) {
+      className += " text-decoration: underline"
+    }
+    return <th className={className} onClick={handleOnClick}>{label}</th>
+  }
+
+  useEffect(() => {
+    async function fetchStandings() {
+      const res = await fetch('http://localhost:8000/standings/')
+      const data = await res.json()
+      setStandings(data)
+    }
+    fetchStandings()
+  }, [])
+
+  if (!standings) return <div>Loading...</div>
+
+  return (
+    <div className="relative overflow-x-auto">
+      <table className="text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <Header label="#" standing_field="pos"/>
+            <Header label="Ekip"/>
+            <Header label="But Pour" standing_field="goals_scored"/>
+            <Header label="But Contre" standing_field="goals_conceded"/>
+            <Header label="Difference" standing_field="difference"/>
+            <Header label="Points"/>
+          </tr>
+        </thead>
+        <tbody>
+          {standings.map((standing) => (
+            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200" key={standing.team}>
+              <td className="text-center"> {standing.pos} </td>
+              <td className="px-2 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">{standing.team}</td>
+              <td className="text-center">{standing.goals_scored}</td>
+              <td className="text-center">{standing.goals_conceded}</td>
+              <td className="text-center">{standing.difference}</td>
+              <td className="text-center">{standing.points}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
-  );
+  )
 }
