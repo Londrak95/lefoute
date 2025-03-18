@@ -1,0 +1,1 @@
+export const teamNameClass = "px-2 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"

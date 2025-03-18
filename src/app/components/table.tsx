@@ -4,7 +4,7 @@ function Header(props) {
   const [order, setOrder] = useState("desc")
 
     let handleOnClick = null
-    if (props.column.sortable) {
+    if ("sortable" in props.column && props.column.sortable) {
       handleOnClick = () => {
         const sorted = [...props.data].sort((a, b) => {
           if (order === "asc") {
@@ -42,11 +42,15 @@ function Headers(props) {
 function Body({columns, data}) {
 	return (
 	  <tbody>
-		  {data.map((row) => (
-	        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200" key={row.pos}>
-	          {columns.map((column, index) => (
-	          	<td className={column.className || "text-center"} key={index}>{row[column.field]}</td>
-	          ))}
+		  {data.map((row, rowIndex) => (
+	        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200" key={rowIndex}>
+	          {columns.map((column, colIndex) => {
+	          	return (
+	          		<td className={column.className ?? (column.classFunc && column.classFunc(row)) ?? "text-center"} key={colIndex}>
+	          			{row[column.field] ?? column.func(row)}
+	          		</td>
+	          	)
+	          })}
 	        </tr>
 	      ))}
 	  </tbody>
@@ -56,12 +60,17 @@ function Body({columns, data}) {
 export default function Table({columns, initial_data}) {
   // Base component for a generic table
   // Parameter @columns should be a list of objects, each object should have
+  //   mandatory
   //   @label: display name of the header
-  //   @field: name of the field inside data to fill the cell
-  //   @sortable: boolean whether the column is sortable or not
+
+  //   one or the other
+  //   @field: key of the row object which holds the value of the cell
+  //   @func: function that takes the row as parameter and returns the value for the cell 
 
   //   optionnal
-  //   @className: additionnal CSS for the values in the column (default is a simple 'text-center')
+  //   @sortable: boolean whether the column is sortable or not (default is false)
+  //   @className: CSS for the values in the column (default is 'text-center')
+  //   @classFunc: function that takes the row as parameter and returns the class to use
 
   // Parameter @initial_data should be a list of objects representing each row
   // Each object should have a field matching the @field parameter in @columns
