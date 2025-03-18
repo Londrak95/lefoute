@@ -8,16 +8,16 @@ import { teamNameClass } from '../css/classes.tsx'
 const columnsInfo = [
 	{
 		label: "#",
-		field: "match_day",
+		getCell: (row) => row.match_day,
 	},
 	{
 		label: "Ekip",
-		field: "against",
+		getCell: (row) => row.against,
 		className: teamNameClass,
 	},
 	{
 		label: "Score",
-		func: (row) => `${row.goals_scored} - ${row.goals_conceded}`,
+		getCell: (row) => `${row.goals_scored} - ${row.goals_conceded}`,
 		classFunc: (row) => {
 			let className = 'text-center'
 			if (row.goals_scored > row.goals_conceded) {
@@ -29,8 +29,44 @@ const columnsInfo = [
 			}
 			return className
 		},
+	},
+	{
+		label: "Buteurs",
+		getCell: (row) => <Scorers matchID={row.match_day}/>
 	}
 ]
+
+function Scorers({matchID}) {
+	const [expanded, setExpanded] = useState(false)
+	const [scorers, setScorers] = useState(null)
+
+	const handleOnClick = () => {
+		if (scorers) {
+			setExpanded(true)
+			return scorers
+		}
+		async function fetchScorers() {
+			const res = await fetch(`http://localhost:8000/scorers/${matchID}/`)
+			const data = await res.json()
+			setScorers(data)
+			setExpanded(true)
+		}
+		fetchScorers()
+	}
+
+	if (!expanded) {
+		return <h1 onClick={handleOnClick}>Voir les buteurs</h1>
+	} else {
+		if (scorers.length === 0) {
+			return <h1 className="text-center">{"Pas de buteurs =/"}</h1>
+		}
+		return <ul onClick={() => setExpanded(false)}>
+			{scorers.map((scorer, idx) =>
+				<li className="text-left" key={idx}> {`${scorer[0]} ${scorer[1]}'`} </li>
+			)}
+		</ul>
+	}
+}
 
 export default function Results() {
 	const [results, setResults] = useState(null)

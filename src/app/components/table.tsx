@@ -47,7 +47,7 @@ function Body({columns, data}) {
 	          {columns.map((column, colIndex) => {
 	          	return (
 	          		<td className={column.className ?? (column.classFunc && column.classFunc(row)) ?? "text-center"} key={colIndex}>
-	          			{row[column.field] ?? column.func(row)}
+	          			{column.getCell(row)}
 	          		</td>
 	          	)
 	          })}
@@ -62,10 +62,7 @@ export default function Table({columns, initial_data}) {
   // Parameter @columns should be a list of objects, each object should have
   //   mandatory
   //   @label: display name of the header
-
-  //   one or the other
-  //   @field: key of the row object which holds the value of the cell
-  //   @func: function that takes the row as parameter and returns the value for the cell 
+  //   @getCell: function that takes the row as parameter and returns the value for the cell
 
   //   optionnal
   //   @sortable: boolean whether the column is sortable or not (default is false)
@@ -74,7 +71,7 @@ export default function Table({columns, initial_data}) {
 
   // Parameter @initial_data should be a list of objects representing each row
   // Each object should have a field matching the @field parameter in @columns
-  
+
   const [data, setData] = useState(initial_data)
 
   return (

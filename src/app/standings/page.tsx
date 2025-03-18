@@ -7,32 +7,32 @@ import { teamNameClass } from '../css/classes.tsx'
 const columunsInfo = [
   {
     label: "#",
-    field: "pos",
+    getCell: (row) => row.pos,
     sortable: true,
   },
   {
     label: "Ekip",
-    field: "team",
+    getCell: (row) => row.team,
     className: teamNameClass,
   },
   {
     label: "But Pour",
-    field: "goals_scored",
+    getCell: (row) => row.goals_scored,
     sortable: true,
   },
   {
     label: "But Contre",
-    field: "goals_conceded",
+    getCell: (row) => row.goals_conceded,
     sortable: true,
   },
   {
     label: "Difference",
-    field: "difference",
+    getCell: (row) => row.difference,
     sortable: true,
   },
   {
     label: "Points",
-    field: "points",
+    getCell: (row) => row.points,
   },
 ]
 
