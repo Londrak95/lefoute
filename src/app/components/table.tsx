@@ -3,36 +3,47 @@ import { useState } from 'react'
 
 function Header(props) {
   const [order, setOrder] = useState("desc")
-  const [sorted, setSorted] = useState(props.sorted)
-
-  let handleOnClick = null
-  if ("sortable" in props.column && props.column.sortable) {
-    handleOnClick = () => {
-      const sortedData = [...props.data].sort((a, b) => {
-        if (order === "asc") {
-          return props.column.getCell(a) < props.column.getCell(b) ? -1 : 1
-        }
-        return props.column.getCell(a) < props.column.getCell(b) ? 1 : -1
-      })
-      setOrder(order === "asc" ? "desc" : "asc")
-      setSorted(true)
-      props.setData(sortedData)
-    }
-  }
 
   let className = "px-6 py-3"
-  if (sorted) {
+  if (props.sorted) {
     className += " text-decoration: underline"
   }
-  return <th className={className} onClick={handleOnClick}>{props.column.label}</th>
+
+  const handleOnClick = () => {
+    props.handleOnClick(order)
+    setOrder(order === "asc" ? "desc" : "asc")
+  }
+  return <th className={className} onClick={handleOnClick}> {props.column.label} </th>
 }
 
 function Headers(props) {
+  const [ordering, setOrdering] = useState(props.columns.map(column => column.sortable === true ? false : null))
+
+  const handleSort = (sorted, index, order) => {
+    if (sorted == null) return null
+
+    const sortedData = [...props.data].sort((a, b) => {
+      if (order === "asc") {
+        return props.columns.at(index).getCell(a) < props.columns.at(index).getCell(b) ? -1 : 1
+      }
+      return props.columns.at(index).getCell(a) < props.columns.at(index).getCell(b) ? 1 : -1
+    })
+
+    props.setData(sortedData)
+    setOrdering(ordering.map((c, i) => {
+      if (i !== index) {
+        return c !== null ? null : false
+      } else {
+        return true
+      }
+    }))
+  }
+
   return (
   	<thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
   	  <tr key="header">
   	  	{props.columns.map((column, index) => (
-		      <Header key={index} column={column} {...props}/>
+		      <Header key={index} column={column} sorted={ordering.at(index)} handleOnClick={(order) => handleSort(ordering.at(index), index, order)}/>
   		))}
   	  </tr>
 	</thead>
