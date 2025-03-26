@@ -4,7 +4,7 @@ import { useState } from 'react'
 function Header(props) {
   const [order, setOrder] = useState("desc")
 
-  let className = "px-6 py-3"
+  let className = "px-6 py-3 text-center"
   if (props.sorted) {
     className += " text-decoration: underline"
   }

@@ -62,7 +62,12 @@ function Scorers({matchID}) {
 		}
 		return <ul onClick={() => setExpanded(false)}>
 			{scorers.map((scorer, idx) =>
-				<li className="text-left" key={idx}> {`${scorer[0]} ${scorer[1]}'`} </li>
+				<li key={idx}>
+					<div className="grid grid-cols-2 place-content-between">
+						<div className="text-left"> {scorer[0]} </div>
+						<div className="text-right"> {scorer[1]}' </div>
+					</div>
+				</li>
 			)}
 		</ul>
 	}
