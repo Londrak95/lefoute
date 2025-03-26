@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import Table from '../components/table'
+import TableWithTittle from '../components/table_with_title'
+import AirlineStopsIcon from '@mui/icons-material/AirlineStops'
+import SportsSoccerIcon from '@mui/icons-material/SportsSoccer'
 
 
 const goalsColumns = [
@@ -27,13 +30,16 @@ const assistsColumns = [
 	},
 ]
 
+
 export default function Performers() {
 	const [performers, setPerformers] = useState(null)
 
 	useEffect(() => {
 		async function fetchPerformers() {
 			const res = await fetch('http://localhost:8000/performers/')
-			const data = await res.json()
+			let data = await res.json()
+			data.goals = data.goals.sort((a, b) => a.goals > b.goals ? -1 : 1)
+			data.assists = data.assists.sort((a, b) => a.assists > b.assists ? -1 : 1)
 			setPerformers(data)
 		}
 		fetchPerformers()
@@ -43,9 +49,9 @@ export default function Performers() {
 	if (!performers) return <div>Loading...</div>
 
 	return (
-		<div className="grid grid-cols-2 gap-4">
-			<Table columns={goalsColumns} initial_data={performers.goals}/>
-			<Table columns={assistsColumns} initial_data={performers.assists}/>
+		<div className="grid auto-cols-max grid-flow-col gap-4 mx-2 my-2">
+			<TableWithTittle title={"Buteurs"} tableColumns={goalsColumns} tableData={performers.goals} icon={<SportsSoccerIcon/>}/>
+			<TableWithTittle title={"Passeurs"} tableColumns={assistsColumns} tableData={performers.assists} icon={<AirlineStopsIcon/>}/>
 		</div>
 	)
 }
