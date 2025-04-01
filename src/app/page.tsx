@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import LogoWithTitle from './components/logo_with_title'
+
 
 const teams = ["Olympique de Marseille"]
 
@@ -16,9 +18,9 @@ function DropDownListElement(props) {
       <>
         <li> {props.label} </li>
         {spread && (
-          <ul className="ml-3 max-w-md space-y-1 text-gray-500 list-[circle] list-inside dark:text-gray-400">
+          <ul className="ml-3 max-w-md space-y-1 text-gray-500">
             {props.choices.map((choice, index) =>
-              <li key={index}> <Link href={props.url} target={"_blank"}> {choice} </Link> </li>
+              <li className="flex flex-row" key={index}> <LogoWithTitle name={choice} link={props.url}/> </li>
             )}
           </ul>
         )}
