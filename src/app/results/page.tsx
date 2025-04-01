@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import Table from '../components/table'
-import '../css/styles.css'
 import { teamNameClass } from '../css/classes.tsx'
 
 const columnsInfo = [
@@ -21,11 +20,11 @@ const columnsInfo = [
 		classFunc: (row) => {
 			let className = 'text-center'
 			if (row.goals_scored > row.goals_conceded) {
-				className += ' green-text'
+				className += ' text-green-700'
 			} else if (row.goals_scored === row.goals_conceded) {
-				className += ' orange-text'
+				className += ' text-orange-500'
 			} else {
-				className += ' red-text'
+				className += ' text-red-400'
 			}
 			return className
 		},
